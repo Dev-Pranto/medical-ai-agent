@@ -19,15 +19,7 @@ A multi-tool AI agent that can answer questions about medical datasets and gener
 3. Set up environment variables:
    - `GEMINI_API_KEY`: Your Google Gemini API key
    - `TAVILY_API_KEY`: Your Tavily API key (optional, for web search)
-4. Download the datasets from Kaggle:
-   - [Heart Disease Dataset](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset)
-   - [Cancer Prediction Dataset](https://www.kaggle.com/datasets/rabieelkharoua/cancer-prediction-dataset)
-   - [Diabetes Dataset](https://www.kaggle.com/datasets/mathchi/diabetes-data-set)
-5. Place the CSV files in the `data/` directory with these names:
-   - `heart.csv`
-   - `cancer.csv`
-   - `diabetes.csv`
-6. Run the Streamlit app: `streamlit run app.py`
+4. Upload your medical datasets through the Streamlit interface
 
 ## Deployment on Streamlit Cloud
 
@@ -42,16 +34,15 @@ A multi-tool AI agent that can answer questions about medical datasets and gener
 ## Usage
 
 1. Open the web application
-2. Ask questions in the chat interface such as:
+2. Upload your medical CSV files through the sidebar
+3. Ask questions in the chat interface such as:
    - "What is the average age of heart disease patients?"
    - "What are the symptoms of diabetes?"
    - "Show me statistics about cancer cases"
-3. The AI will automatically determine whether to use the medical datasets or web search
+4. The AI will automatically determine whether to use the medical datasets or web search
 
 ## Project Structure
 
 - `app.py`: Streamlit web application
 - `medical_agent.py`: Core AI agent with Gemini integration
-- `data/`: Directory for medical datasets (CSV files)
-- `databases/`: Directory for SQLite databases (created automatically)
 - `requirements.txt`: Python dependencies
