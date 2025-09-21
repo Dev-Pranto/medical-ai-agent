@@ -1,11 +1,6 @@
 import streamlit as st
-import google.generativeai as genai
 from medical_agent import MedicalAIAgent
 import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 # Configure page
 st.set_page_config(
@@ -16,13 +11,14 @@ st.set_page_config(
 
 # Initialize session state
 if "agent" not in st.session_state:
-    gemini_api_key = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
-    tavily_api_key = os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY")
-
-    if not gemini_api_key:
-        st.error("Please set GEMINI_API_KEY in your environment variables or Streamlit secrets")
+    # Get API keys from Streamlit secrets
+    try:
+        gemini_api_key = st.secrets["GEMINI_API_KEY"]
+        tavily_api_key = st.secrets["TAVILY_API_KEY"]
+    except:
+        st.error("API keys not found. Please check your Streamlit secrets configuration.")
         st.stop()
-
+    
     st.session_state.agent = MedicalAIAgent(gemini_api_key, tavily_api_key)
 
 if "messages" not in st.session_state:
@@ -39,20 +35,20 @@ with st.sidebar:
     This AI assistant can help with:
     - Answering questions about medical datasets (Heart Disease, Cancer, Diabetes)
     - Providing general medical knowledge from web sources
-
+    
     **Datasets used:**
     - Heart Disease Dataset
     - Cancer Prediction Dataset
     - Diabetes Dataset
     """)
-
+    
     st.header("Examples")
     if st.button("Heart disease data analysis"):
         st.session_state.messages.append({"role": "user", "content": "What is the average age of patients with heart disease?"})
-
+    
     if st.button("Diabetes symptoms"):
         st.session_state.messages.append({"role": "user", "content": "What are the common symptoms of diabetes?"})
-
+    
     if st.button("Cancer statistics"):
         st.session_state.messages.append({"role": "user", "content": "How many cases of each cancer type are in the dataset?"})
 
@@ -65,16 +61,16 @@ for message in st.session_state.messages:
 if prompt := st.chat_input("Ask a medical question..."):
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
-
+    
     # Display user message
     with st.chat_message("user"):
         st.markdown(prompt)
-
+    
     # Get assistant response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = st.session_state.agent.ask_question(prompt)
         st.markdown(response)
-
+    
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response})
