@@ -10,25 +10,21 @@ class MedicalAIAgent:
         # Configure Gemini
         genai.configure(api_key=gemini_api_key)
         
-        # List available models and use the first suitable one
-        try:
-            models = genai.list_models()
-            model_name = None
-            for model in models:
-                if 'generateContent' in model.supported_generation_methods:
-                    model_name = model.name
-                    break
-            
-            if model_name:
+        # Try available models in order
+        available_models = ['gemini-1.5-flash', 'gemini-2.5-flash']
+        self.model = None
+        
+        for model_name in available_models:
+            try:
                 self.model = genai.GenerativeModel(model_name)
-                print(f"Using model: {model_name}")
-            else:
-                # Fallback to a known model name
-                self.model = genai.GenerativeModel('gemini-pro')
-        except Exception as e:
-            print(f"Error initializing model: {e}")
-            # Fallback to a known model name
-            self.model = genai.GenerativeModel('gemini-pro')
+                print(f"Successfully initialized model: {model_name}")
+                break
+            except Exception as e:
+                print(f"Failed to initialize {model_name}: {e}")
+                continue
+        
+        if self.model is None:
+            raise Exception("Could not initialize any of the available Gemini models")
         
         # Configure Tavily for web search (optional)
         self.tavily_client = TavilyClient(api_key=tavily_api_key) if tavily_api_key else None
