@@ -1,5 +1,7 @@
 import streamlit as st
 from medical_agent import MedicalAIAgent
+import sqlite3
+import pandas as pd
 import os
 
 # Configure page
@@ -24,7 +26,12 @@ if "agent" not in st.session_state:
         st.error("Please set GEMINI_API_KEY in your environment variables or Streamlit secrets")
         st.stop()
     
-    st.session_state.agent = MedicalAIAgent(gemini_api_key, tavily_api_key)
+    try:
+        st.session_state.agent = MedicalAIAgent(gemini_api_key, tavily_api_key)
+        st.success("AI Agent initialized successfully!")
+    except Exception as e:
+        st.error(f"Failed to initialize AI Agent: {str(e)}")
+        st.stop()
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
