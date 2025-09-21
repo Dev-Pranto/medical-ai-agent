@@ -11,12 +11,17 @@ st.set_page_config(
 
 # Initialize session state
 if "agent" not in st.session_state:
-    # Get API keys from Streamlit secrets
+    # Get API keys from Streamlit secrets or environment variables
     try:
         gemini_api_key = st.secrets["GEMINI_API_KEY"]
         tavily_api_key = st.secrets["TAVILY_API_KEY"]
     except:
-        st.error("API keys not found. Please check your Streamlit secrets configuration.")
+        # Fallback to environment variables
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        tavily_api_key = os.getenv("TAVILY_API_KEY")
+    
+    if not gemini_api_key:
+        st.error("Please set GEMINI_API_KEY in your environment variables or Streamlit secrets")
         st.stop()
     
     st.session_state.agent = MedicalAIAgent(gemini_api_key, tavily_api_key)
@@ -36,11 +41,36 @@ with st.sidebar:
     - Answering questions about medical datasets (Heart Disease, Cancer, Diabetes)
     - Providing general medical knowledge from web sources
     
-    **Datasets used:**
-    - Heart Disease Dataset
-    - Cancer Prediction Dataset
-    - Diabetes Dataset
+    **Note:** The medical datasets need to be uploaded as CSV files and converted to SQLite databases.
     """)
+    
+    st.header("Upload Medical Data")
+    st.info("To use the data analysis features, please upload your medical CSV files:")
+    
+    uploaded_heart = st.file_uploader("Heart Disease Data (CSV)", type="csv")
+    uploaded_cancer = st.file_uploader("Cancer Data (CSV)", type="csv")
+    uploaded_diabetes = st.file_uploader("Diabetes Data (CSV)", type="csv")
+    
+    if uploaded_heart:
+        df = pd.read_csv(uploaded_heart)
+        conn = sqlite3.connect("heart_disease.db")
+        df.to_sql("heart_disease", conn, if_exists="replace", index=False)
+        conn.close()
+        st.success("Heart disease data uploaded successfully!")
+    
+    if uploaded_cancer:
+        df = pd.read_csv(uploaded_cancer)
+        conn = sqlite3.connect("cancer.db")
+        df.to_sql("cancer", conn, if_exists="replace", index=False)
+        conn.close()
+        st.success("Cancer data uploaded successfully!")
+    
+    if uploaded_diabetes:
+        df = pd.read_csv(uploaded_diabetes)
+        conn = sqlite3.connect("diabetes.db")
+        df.to_sql("diabetes", conn, if_exists="replace", index=False)
+        conn.close()
+        st.success("Diabetes data uploaded successfully!")
     
     st.header("Examples")
     if st.button("Heart disease data analysis"):
