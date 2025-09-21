@@ -1,8 +1,5 @@
-streamlit
-google-generativeai
-pandas
-sqlite3
-sqlalchemy
-plotly
-python-dotenv
-tavily-python
+streamlit==1.49.1
+google-generativeai==0.8.5
+pandas==2.3.2
+tavily-python==0.3.5
+python-dotenv==1.0.0
