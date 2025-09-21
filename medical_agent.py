@@ -2,6 +2,7 @@ import google.generativeai as genai
 import sqlite3
 import pandas as pd
 from tavily import TavilyClient
+import os
 import re
 
 class MedicalAIAgent:
@@ -15,10 +16,23 @@ class MedicalAIAgent:
         
         # Database paths
         self.db_paths = {
-            "heart": "databases/heart_disease.db",
-            "cancer": "databases/cancer.db",
-            "diabetes": "databases/diabetes.db"
+            "heart": "heart_disease.db",
+            "cancer": "cancer.db",
+            "diabetes": "diabetes.db"
         }
+        
+        # Initialize databases if they don't exist
+        self.initialize_databases()
+    
+    def initialize_databases(self):
+        """Create empty databases with proper schema if they don't exist"""
+        # This is a placeholder - in a real app, you'd create proper schemas
+        # or load from CSV files
+        for db_name, db_path in self.db_paths.items():
+            if not os.path.exists(db_path):
+                conn = sqlite3.connect(db_path)
+                conn.close()
+                print(f"Created empty database: {db_path}")
     
     def query_database(self, db_name, query):
         """Execute SQL query on the specified database"""
