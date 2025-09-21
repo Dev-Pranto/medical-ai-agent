@@ -9,7 +9,26 @@ class MedicalAIAgent:
     def __init__(self, gemini_api_key, tavily_api_key=None):
         # Configure Gemini
         genai.configure(api_key=gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        
+        # List available models and use the first suitable one
+        try:
+            models = genai.list_models()
+            model_name = None
+            for model in models:
+                if 'generateContent' in model.supported_generation_methods:
+                    model_name = model.name
+                    break
+            
+            if model_name:
+                self.model = genai.GenerativeModel(model_name)
+                print(f"Using model: {model_name}")
+            else:
+                # Fallback to a known model name
+                self.model = genai.GenerativeModel('gemini-pro')
+        except Exception as e:
+            print(f"Error initializing model: {e}")
+            # Fallback to a known model name
+            self.model = genai.GenerativeModel('gemini-pro')
         
         # Configure Tavily for web search (optional)
         self.tavily_client = TavilyClient(api_key=tavily_api_key) if tavily_api_key else None
@@ -20,19 +39,6 @@ class MedicalAIAgent:
             "cancer": "cancer.db",
             "diabetes": "diabetes.db"
         }
-        
-        # Initialize databases if they don't exist
-        self.initialize_databases()
-    
-    def initialize_databases(self):
-        """Create empty databases with proper schema if they don't exist"""
-        # This is a placeholder - in a real app, you'd create proper schemas
-        # or load from CSV files
-        for db_name, db_path in self.db_paths.items():
-            if not os.path.exists(db_path):
-                conn = sqlite3.connect(db_path)
-                conn.close()
-                print(f"Created empty database: {db_path}")
     
     def query_database(self, db_name, query):
         """Execute SQL query on the specified database"""
